@@ -1,0 +1,8 @@
+# Backups created by install.sh
+*.backup.*
+
+# macOS
+.DS_Store
+
+# Local-only overrides (machine-specific, never committed)
+*.local

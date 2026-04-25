@@ -1,0 +1,119 @@
+{
+  "model": "sonnet",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/detect-docker.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git blame:*)",
+      "Bash(git stash list:*)",
+      "Bash(git remote -v)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(rg:*)",
+      "Bash(fd:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(pwd)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(composer show:*)",
+      "Bash(composer info:*)",
+      "Bash(composer validate:*)",
+      "Bash(composer diagnose:*)",
+      "Bash(docker compose exec php vendor/bin/phpunit:*)",
+      "Bash(docker compose exec php vendor/bin/phpstan:*)",
+      "Bash(docker compose exec php bin/console debug:*)",
+      "Bash(docker compose exec php bin/console lint:*)",
+      "Bash(docker compose exec php bin/console cache:clear)",
+      "Bash(docker compose ps)",
+      "Bash(docker compose logs:*)",
+      "Bash(docker compose config:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(node --version)",
+      "Bash(pnpm --version)",
+      "Bash(php --version)",
+      "Read(*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git rebase:*)",
+      "Bash(git checkout:*)",
+      "Bash(composer install:*)",
+      "Bash(composer update:*)",
+      "Bash(docker compose exec php bin/console doctrine:migrations:*)",
+      "Bash(docker compose exec php bin/console doctrine:schema:*)",
+      "Bash(docker compose up:*)",
+      "Bash(docker compose restart:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr close:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh issue close:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(chmod 777:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(gh pr merge --admin:*)",
+      "Bash(composer require:*)",
+      "Bash(composer remove:*)",
+      "Bash(docker compose down:*)",
+      "Bash(docker system prune:*)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "pr-workflow-tools@ordio-tools": true,
+    "github@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true,
+  "mcpServers": {
+    "broker": {
+      "command": "node",
+      "args": [
+        "/Users/alexander/Desktop/claude-broker/dist/index.js"
+      ],
+      "env": {
+        "BROKER_DB_PATH": "/Users/alexander/Desktop/claude-broker/data/broker.sqlite"
+      }
+    }
+  }
+}
