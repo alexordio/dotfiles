@@ -1,19 +1,5 @@
 {
-  "model": "sonnet",
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/detect-docker.sh"
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
-    "defaultMode": "acceptEdits",
     "allow": [
       "Bash(git status:*)",
       "Bash(git diff:*)",
@@ -22,7 +8,19 @@
       "Bash(git branch:*)",
       "Bash(git blame:*)",
       "Bash(git stash list:*)",
+      "Bash(git stash show:*)",
       "Bash(git remote -v)",
+      "Bash(git rev-parse:*)",
+      "Bash(git config --get:*)",
+      "Bash(git config --list)",
+      "Bash(git tag:*)",
+      "Bash(git describe:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git reflog:*)",
+      "Bash(git shortlog:*)",
+      "Bash(git worktree list)",
+      "Bash(git fetch:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(head:*)",
@@ -36,41 +34,174 @@
       "Bash(pwd)",
       "Bash(which:*)",
       "Bash(echo:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(du:*)",
+      "Bash(diff:*)",
+      "Bash(realpath:*)",
+      "Bash(readlink:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+      "Bash(awk:*)",
+      "Bash(sed -n:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(column:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(xmllint --noout:*)",
+      "Bash(test:*)",
+      "Bash([ :*)",
+      "Bash(cd:*)",
+      "Bash(pushd:*)",
+      "Bash(popd:*)",
+      "Bash(xargs:*)",
+      "Bash(tee:*)",
       "Bash(composer show:*)",
+      "Bash(composer show)",
       "Bash(composer info:*)",
       "Bash(composer validate:*)",
       "Bash(composer diagnose:*)",
+      "Bash(composer outdated:*)",
+      "Bash(composer licenses)",
+      "Bash(composer audit:*)",
       "Bash(docker compose exec php vendor/bin/phpunit:*)",
       "Bash(docker compose exec php vendor/bin/phpstan:*)",
+      "Bash(docker compose exec php vendor/bin/php-cs-fixer fix --dry-run:*)",
+      "Bash(docker compose exec php vendor/bin/psalm --no-cache)",
       "Bash(docker compose exec php bin/console debug:*)",
       "Bash(docker compose exec php bin/console lint:*)",
       "Bash(docker compose exec php bin/console cache:clear)",
+      "Bash(docker compose exec php bin/console about)",
+      "Bash(docker compose exec php bin/console doctrine:mapping:info)",
+      "Bash(docker compose exec php php --version)",
+      "Bash(docker compose exec -T php:*)",
       "Bash(docker compose ps)",
       "Bash(docker compose logs:*)",
       "Bash(docker compose config:*)",
+      "Bash(docker compose top)",
+      "Bash(docker compose images)",
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker network ls)",
+      "Bash(docker volume ls)",
       "Bash(gh pr view:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr checks:*)",
+      "Bash(gh pr status)",
       "Bash(gh issue view:*)",
       "Bash(gh issue list:*)",
       "Bash(gh repo view:*)",
+      "Bash(gh repo list:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
+      "Bash(gh api -X GET:*)",
+      "Bash(gh auth status)",
+      "Bash(gh release list:*)",
+      "Bash(gh release view:*)",
+      "Bash(gh workflow list:*)",
+      "Bash(gh workflow view:*)",
+      "Bash(gh search:*)",
+      "Bash(gh label list:*)",
+      "Bash(gh gist list:*)",
+      "Bash(gh gist view:*)",
       "Bash(node --version)",
       "Bash(pnpm --version)",
       "Bash(php --version)",
-      "Read(*)"
+      "Bash(pnpm list:*)",
+      "Bash(pnpm why:*)",
+      "Bash(pnpm outdated:*)",
+      "Bash(pnpm exec tsc --noEmit:*)",
+      "Bash(pnpm exec eslint:*)",
+      "Bash(pnpm exec prettier --check:*)",
+      "Bash(pnpm run lint:*)",
+      "Bash(pnpm run typecheck:*)",
+      "Bash(pnpm run test:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(npx tsc --noEmit:*)",
+      "Bash(npm list:*)",
+      "Bash(npm view:*)",
+      "Bash(npm outdated:*)",
+      "Bash(tsc --noEmit:*)",
+      "Bash(env)",
+      "Bash(printenv:*)",
+      "Bash(date:*)",
+      "Bash(uname:*)",
+      "Bash(whoami)",
+      "Bash(uptime)",
+      "Bash(df:*)",
+      "Bash(true)",
+      "Bash(false)",
+      "Bash(sleep:*)",
+      "Bash(history:*)",
+      "Read(./**)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(rm -Rf:*)",
+      "Bash(sudo:*)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(chmod 777:*)",
+      "Bash(dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --mirror:*)",
+      "Bash(git update-ref -d:*)",
+      "Bash(git reflog expire:*)",
+      "Bash(git gc --prune=now)",
+      "Bash(gh pr merge --admin:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(gh secret set:*)",
+      "Bash(gh secret delete:*)",
+      "Bash(gh ssh-key:*)",
+      "Bash(gh auth login:*)",
+      "Bash(gh auth logout:*)",
+      "Bash(composer require:*)",
+      "Bash(composer remove:*)",
+      "Bash(npm publish:*)",
+      "Bash(pnpm publish:*)",
+      "Bash(docker compose down:*)",
+      "Bash(docker compose down -v:*)",
+      "Bash(docker volume rm:*)",
+      "Bash(docker volume prune:*)",
+      "Bash(docker rmi:*)",
+      "Bash(docker system prune:*)",
+      "Bash(docker system prune --volumes:*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)"
     ],
     "ask": [
       "Bash(git push:*)",
       "Bash(git reset --hard:*)",
       "Bash(git rebase:*)",
       "Bash(git checkout:*)",
+      "Bash(git switch:*)",
       "Bash(composer install:*)",
       "Bash(composer update:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(npm install:*)",
+      "Bash(npm i:*)",
+      "Bash(npx:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(gh api:*)",
       "Bash(docker compose exec php bin/console doctrine:migrations:*)",
       "Bash(docker compose exec php bin/console doctrine:schema:*)",
+      "Bash(docker compose exec php bin/console doctrine:fixtures:*)",
+      "Bash(docker compose exec php bin/console doctrine:query:sql:*)",
       "Bash(docker compose up:*)",
       "Bash(docker compose restart:*)",
       "Bash(gh pr create:*)",
@@ -79,20 +210,41 @@
       "Bash(gh issue create:*)",
       "Bash(gh issue close:*)"
     ],
-    "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(sudo:*)",
-      "Bash(curl * | sh)",
-      "Bash(curl * | bash)",
-      "Bash(wget * | sh)",
-      "Bash(chmod 777:*)",
-      "Bash(git push --force:*)",
-      "Bash(git push -f:*)",
-      "Bash(gh pr merge --admin:*)",
-      "Bash(composer require:*)",
-      "Bash(composer remove:*)",
-      "Bash(docker compose down:*)",
-      "Bash(docker system prune:*)"
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Glass.aiff 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/detect-docker.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/auto-approve/approve-compound-bash.sh",
+            "timeout": 3
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -102,9 +254,19 @@
   "enabledPlugins": {
     "pr-workflow-tools@ordio-tools": true,
     "github@claude-plugins-official": true,
-    "swift-lsp@claude-plugins-official": true
+    "swift-lsp@claude-plugins-official": true,
+    "warp@claude-code-warp": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
+  "agentPushNotifEnabled": true,
   "mcpServers": {
     "broker": {
       "command": "node",
@@ -115,5 +277,6 @@
         "BROKER_DB_PATH": "/Users/alexander/Desktop/claude-broker/data/broker.sqlite"
       }
     }
-  }
+  },
+  "model": "sonnet"
 }

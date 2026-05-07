@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": ["Read(./**)"],
+    "deny": [
+      "Read(//Users/CHANGE_ME/.ssh/**)",
+      "Read(//Users/CHANGE_ME/.aws/**)",
+      "Read(//Users/CHANGE_ME/.gnupg/**)",
+      "Read(//Users/CHANGE_ME/.config/gh/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)"
+    ]
+  }
+}
