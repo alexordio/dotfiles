@@ -153,9 +153,45 @@ else
   echo "  ! No ~/.zshrc found, skipping shell setup"
 fi
 
+# ─── Self-harness (daily proposal loop) ──────────────────────────────────
+echo ""
+echo "Setting up self-harness..."
+if ! has sqlite3; then
+  echo "  ! sqlite3 not found — skipping self-harness setup."
+else
+  # macOS has no `timeout`(1) — it's a GNU coreutils command. self-harness
+  # needs it to bound the claude -p calls, so pull in coreutils for `gtimeout`.
+  if ! has gtimeout; then
+    if has brew; then
+      echo "  → installing coreutils (for gtimeout)"
+      brew install coreutils
+    else
+      echo "  ! Homebrew not found — install coreutils manually for gtimeout, or self-harness's claude -p calls won't time out."
+    fi
+  else
+    echo "  ✓ coreutils (gtimeout) present"
+  fi
+
+  chmod +x "$DOTFILES_DIR"/claude/self-harness/*.sh
+  mkdir -p "$HOME/.claude/self-harness"
+  sqlite3 "$HOME/.claude/self-harness/harness.sqlite" < "$DOTFILES_DIR/claude/self-harness/schema.sql"
+  echo "  ✓ harness.sqlite ready at $HOME/.claude/self-harness/harness.sqlite"
+
+  PLIST_DST="$HOME/Library/LaunchAgents/com.alexander.claude-self-harness.plist"
+  link "$DOTFILES_DIR/claude/self-harness/com.alexander.claude-self-harness.plist" "$PLIST_DST"
+  launchctl bootstrap "gui/$(id -u)" "$PLIST_DST" 2>/dev/null || launchctl load "$PLIST_DST" 2>/dev/null || true
+  echo "  ✓ LaunchAgent installed — runs daily at 09:00 (or on wake, if the Mac was asleep)"
+
+  if [ ! -f "$HOME/.claude/self-harness/slack-webhook.txt" ]; then
+    echo "  ! create $HOME/.claude/self-harness/slack-webhook.txt with your Slack Incoming Webhook URL to enable notifications"
+  fi
+fi
+
 echo ""
 echo "Done. Open a new terminal session for shell changes to take effect."
 echo ""
 echo "Next steps:"
 echo "  1. Edit ~/.claude/settings.local.json with your own project paths."
 echo "  2. Restart any open Claude Code sessions to pick up the new config."
+echo "  3. Create ~/.claude/self-harness/slack-webhook.txt with your Slack Incoming Webhook URL."
+echo "  4. Review proposals anytime with ~/dotfiles/claude/self-harness/review.sh"
