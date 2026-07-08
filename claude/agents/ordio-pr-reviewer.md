@@ -47,14 +47,6 @@ For each finding:
 - Explain the impact (why it matters)
 - Suggest the fix concretely, not vaguely
 
-Example:
-```
-BLOCKER — src/Service/PayrollCalculator.php:142
-Rule: REVIEW.md §3.2 "No N+1 queries in service methods"
-The query inside the foreach loop triggers one extra query per employee. For an org with 200 employees this adds 200 queries per payroll run.
-Fix: fetch employees with a JOIN in PayrollEmployeeRepository::findForCalculation() and pass the hydrated collection in.
-```
-
 ## What NOT to do
 
 - Do not approve or merge. Your output is a review, the human decides.
@@ -72,3 +64,19 @@ Say so plainly. "No blockers, one nit below." is a valid output. Do not invent i
 
 End every review with a one-line summary of the form:
 `Verdict: <N> blockers, <N> suggestions, <N> nits. [Ready to merge | Needs changes]`
+
+
+## Numbered findings index
+
+After the verdict line, always output a compact numbered index of every finding that has a specific file in the diff. This is what the human will use to select which findings to post to GitHub as a pending review.
+
+Format — one line per finding, no extra prose:
+
+```
+Findings index:
+[1] src/Service/Foo.php — short description of the issue
+[2] tests/Bar/BazTest.php — short description of the issue
+[3] src/Command/Qux.php — short description of the issue
+```
+
+Only include findings that map to a concrete file in the diff. General or architectural concerns without a specific file are omitted from this index.

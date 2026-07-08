@@ -29,6 +29,11 @@
 - Fail fast. Prefer explicit errors over silent fallbacks.
 - Match the existing style of the file you are editing, even if it disagrees with general best practices.
 
+## Claude plugins (ordio)
+
+- To sync ordio plugins: `sync-ordio-plugins` (alias in `~/.zshrc`). Updates existing + installs new ones from https://github.com/ordio/claude-plugins.
+- After syncing, always add any newly installed plugins to `enabledPlugins` in the project's `.claude/settings.json`.
+
 ## What NOT to do
 
 - Do not apologize repeatedly. One acknowledgment is enough.
