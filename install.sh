@@ -46,7 +46,11 @@ echo "Linking Claude config..."
 link "$DOTFILES_DIR/claude/CLAUDE.md"                    "$HOME/.claude/CLAUDE.md"
 link "$DOTFILES_DIR/claude/settings.json"                "$HOME/.claude/settings.json"
 link "$DOTFILES_DIR/claude/statusline.sh"                "$HOME/.claude/statusline.sh"
+link "$DOTFILES_DIR/claude/ccx.sh"                       "$HOME/.claude/ccx.sh"
 link "$DOTFILES_DIR/claude/hooks/detect-docker.sh"       "$HOME/.claude/hooks/detect-docker.sh"
+
+mkdir -p "$HOME/.claude/plugins/cache/personal"
+link "$DOTFILES_DIR/claude/personal-plugin"              "$HOME/.claude/plugins/cache/personal/personal"
 
 for agent in "$DOTFILES_DIR"/claude/agents/*.md; do
   [ -f "$agent" ] || continue

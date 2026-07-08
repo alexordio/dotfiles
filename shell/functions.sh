@@ -1,3 +1,7 @@
+function ccx() {
+  bash ~/.claude/ccx.sh "$PWD"
+}
+
 function commit() {
   commitMessage="$*"
   git add .

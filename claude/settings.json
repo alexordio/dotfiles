@@ -136,10 +136,15 @@
       "Bash(whoami)",
       "Bash(uptime)",
       "Bash(df:*)",
+      "Bash(bash ~/.claude/ccx.sh*)",
       "Bash(true)",
       "Bash(false)",
       "Bash(sleep:*)",
       "Bash(history:*)",
+      "Read(//Users/alexander/Desktop/**)",
+      "Read(//Users/alexander/dev/**)",
+      "Read(//Users/alexander/aluqhof/**)",
+      "Read(//Users/alexander/ordio/**)",
       "Read(./**)"
     ],
     "deny": [
@@ -177,6 +182,10 @@
       "Bash(docker rmi:*)",
       "Bash(docker system prune:*)",
       "Bash(docker system prune --volumes:*)",
+      "Read(//Users/alexander/.ssh/**)",
+      "Read(//Users/alexander/.aws/**)",
+      "Read(//Users/alexander/.gnupg/**)",
+      "Read(//Users/alexander/.config/gh/**)",
       "Read(**/.env)",
       "Read(**/.env.*)",
       "Read(**/secrets/**)"
@@ -212,6 +221,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -230,6 +240,11 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/detect-docker.sh"
+          },
+          {
+            "type": "command",
+            "command": "echo \"$PWD\" > ~/.claude/current_project",
+            "async": true
           }
         ]
       }
@@ -252,12 +267,45 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
+    "personal@personal": true,
+    "agent-testing@ordio-tools": true,
+    "commit@ordio-tools": true,
+    "core-test-planner@ordio-tools": true,
+    "create-plan@ordio-tools": true,
+    "doc-coauthoring@ordio-tools": true,
+    "e2e-tools@ordio-tools": true,
+    "feature-research@ordio-tools": true,
+    "feature-transfer@ordio-tools": true,
+    "gh-pr-description@ordio-tools": true,
+    "grill-with-docs@ordio-tools": true,
+    "linear-ideation@ordio-tools": true,
+    "multi-instance@ordio-tools": true,
     "pr-workflow-tools@ordio-tools": true,
+    "product-updates@ordio-tools": true,
+    "release-train@ordio-tools": true,
+    "research-codebase@ordio-tools": true,
+    "skill-development@ordio-tools": true,
     "github@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
+    "html-review@ordio-tools": true,
+    "ordio-SDD@ordio-tools": true,
+    "ponytail@ponytail": true,
+    "sincrai@sincrai": true,
     "warp@claude-code-warp": true
   },
   "extraKnownMarketplaces": {
+    "personal": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/alexander/dotfiles/claude/personal-plugin"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
     "claude-code-warp": {
       "source": {
         "source": "github",
@@ -266,6 +314,8 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
   "mcpServers": {
     "broker": {
@@ -277,6 +327,5 @@
         "BROKER_DB_PATH": "/Users/alexander/Desktop/claude-broker/data/broker.sqlite"
       }
     }
-  },
-  "model": "sonnet"
+  }
 }

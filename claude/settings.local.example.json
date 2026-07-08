@@ -1,6 +1,8 @@
 {
   "permissions": {
     "allow": ["Read(./**)"],
+    "//additionalDirectories": "OPTIONAL, machine-local (this file is gitignored): cross-repo file access. List sibling repo roots — or one parent dir — you want Claude to read/edit from any session in this project. Grants FILE ACCESS only; it does NOT load the other repo's CLAUDE.md. To work in another repo with its own conventions, prefer the personal:repo-agent skill (spawns a Claude rooted in that repo).",
+    "additionalDirectories": ["/Users/CHANGE_ME/path/to/your/repos"],
     "deny": [
       "Read(//Users/CHANGE_ME/.ssh/**)",
       "Read(//Users/CHANGE_ME/.aws/**)",
