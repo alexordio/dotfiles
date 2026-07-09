@@ -94,6 +94,26 @@ assert_eq "long-lived session upsert doesn't duplicate the row" "1" "$session_co
 last_line="$(db "SELECT last_line FROM sessions WHERE id='s2';")"
 assert_eq "long-lived session upsert advances last_line" "120" "$last_line"
 
+# default_branch, against real repos — this is what stopped mine-and-propose.sh
+# from branching a proposal off whatever feature branch happened to be
+# checked out instead of the repo's actual default branch.
+assert_eq "default_branch: dotfiles" "main" "$(default_branch "$DOTFILES_DIR")"
+assert_eq "default_branch: ordio-standards" "main" "$(default_branch "$ORDIO_STANDARDS_DIR")"
+
+# parse_proposals: clean result, malformed .result, and missing .result
+# entirely — the last two must dump a debug file instead of vanishing silently.
+SH_HOME="$tmpdir"
+clean_result='{"result":"{\"proposals\":[{\"target_surface\":\"skill\"}]}"}'
+assert_eq "parse_proposals: clean result parses" '[{"target_surface":"skill"}]' "$(parse_proposals "$clean_result" "clean" 2>/dev/null)"
+
+malformed_result='{"result":"not json"}'
+parse_proposals "$malformed_result" "malformed-test" >/dev/null 2>&1
+assert_eq "parse_proposals: malformed .result dumps a debug file" "yes" "$([ -f "$SH_HOME/last-failure-malformed-test.json" ] && echo yes || echo no)"
+
+no_result_field='{"type":"result"}'
+parse_proposals "$no_result_field" "missing-test" >/dev/null 2>&1
+assert_eq "parse_proposals: missing .result dumps a debug file" "yes" "$([ -f "$SH_HOME/last-failure-missing-test.json" ] && echo yes || echo no)"
+
 if [ "$fail" -eq 0 ]; then
   echo "All smoke checks passed."
 else

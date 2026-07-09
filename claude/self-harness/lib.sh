@@ -53,3 +53,36 @@ is_repo_local_target() {
 sql_escape() {
   printf '%s' "$1" | sed "s/'/''/g"
 }
+
+default_branch() {
+  git -C "$1" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@'
+}
+
+# Parses `claude -p --output-format json`'s .result (itself a JSON string) into
+# a .proposals array. On any failure this dumps the raw response to
+# $SH_HOME/last-failure-<tag>.json instead of silently defaulting to an empty
+# array — a proposal stage that did real work (branch/commit) but failed to
+# report it must leave a trace, not vanish.
+parse_proposals() {
+  local result_json="$1" debug_tag="$2" raw_result parsed parse_ok
+  set +e
+  raw_result=$(echo "$result_json" | jq -r '.result // empty' 2>/dev/null)
+  set -e
+  if [ -z "$raw_result" ]; then
+    echo "  ! empty .result from claude -p ($debug_tag) — see $SH_HOME/last-failure-$debug_tag.json" >&2
+    echo "$result_json" > "$SH_HOME/last-failure-$debug_tag.json"
+    echo '[]'
+    return
+  fi
+  set +e
+  parsed=$(echo "$raw_result" | jq -c '.proposals // []' 2>/dev/null)
+  parse_ok=$?
+  set -e
+  if [ "$parse_ok" -ne 0 ]; then
+    echo "  ! could not parse proposals JSON ($debug_tag) — see $SH_HOME/last-failure-$debug_tag.json" >&2
+    echo "$raw_result" > "$SH_HOME/last-failure-$debug_tag.json"
+    echo '[]'
+    return
+  fi
+  echo "$parsed"
+}
