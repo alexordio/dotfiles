@@ -69,7 +69,12 @@ When done, respond with ONLY this JSON (no prose, no markdown fences):
 {\"proposals\": [{\"target_surface\": \"skill|subagent|claude_md|ordio_standards|out_of_scope\", \"target_path\": \"<repo-relative path, or null for out_of_scope>\", \"branch\": \"<branch name, or null for out_of_scope>\", \"summary\": \"<what changed and why, one paragraph>\", \"incident_ids\": [<the incident ids this is built on>]}]}"
 
   set +e
-  result_json=$(cd "$repo_dir" && gtimeout 1500 claude -p "$prompt" --output-format json --permission-mode acceptEdits 2>/dev/null)
+  # acceptEdits only auto-approves Edit/Write — git checkout/add/commit are
+  # "ask" (or unlisted) in the global permissions and there's no one to answer
+  # an ask prompt headlessly, so they silently deny. Grant exactly the 3 git
+  # subcommands this pass needs to branch and commit, scoped to this one call.
+  result_json=$(cd "$repo_dir" && gtimeout 1500 claude -p "$prompt" --output-format json --permission-mode acceptEdits \
+    --allowedTools "Bash(git checkout:*) Bash(git add:*) Bash(git commit:*)" 2>/dev/null)
   exit_code=$?
   set -e
   if [ $exit_code -ne 0 ] || [ -z "$result_json" ]; then
