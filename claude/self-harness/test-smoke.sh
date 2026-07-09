@@ -83,6 +83,17 @@ db "INSERT INTO proposals (target_surface, target_repo, target_path, content, su
 count2="$(db "SELECT COUNT(*) FROM proposals WHERE target_surface='repo_local';")"
 assert_eq "repo_local proposal insert/select round trip" "1" "$count2"
 
+# Upsert pattern digest-sessions.sh relies on: a long-lived session (never
+# closed, just /clear'd) must advance last_line in place, not duplicate the row.
+db "INSERT INTO sessions (id, repo, project_path, last_line) VALUES ('s2', 'ordio', '/tmp/ordio', 50)
+    ON CONFLICT(id) DO UPDATE SET last_line = 50, digested_at = datetime('now');"
+db "INSERT INTO sessions (id, repo, project_path, last_line) VALUES ('s2', 'ordio', '/tmp/ordio', 120)
+    ON CONFLICT(id) DO UPDATE SET last_line = 120, digested_at = datetime('now');"
+session_count="$(db "SELECT COUNT(*) FROM sessions WHERE id='s2';")"
+assert_eq "long-lived session upsert doesn't duplicate the row" "1" "$session_count"
+last_line="$(db "SELECT last_line FROM sessions WHERE id='s2';")"
+assert_eq "long-lived session upsert advances last_line" "120" "$last_line"
+
 if [ "$fail" -eq 0 ]; then
   echo "All smoke checks passed."
 else
