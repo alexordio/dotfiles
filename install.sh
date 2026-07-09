@@ -172,6 +172,19 @@ else
     echo "  ✓ coreutils (gtimeout) present"
   fi
 
+  # git-delta: review.sh renders proposal diffs through it when present
+  # (syntax-highlighted, readable) — falls back to plain diff otherwise.
+  if ! has delta; then
+    if has brew; then
+      echo "  → installing git-delta (nicer diffs in review.sh)"
+      brew install git-delta
+    else
+      echo "  ! Homebrew not found — install git-delta manually for nicer review.sh diffs (optional, falls back to plain diff)."
+    fi
+  else
+    echo "  ✓ delta present"
+  fi
+
   chmod +x "$DOTFILES_DIR"/claude/self-harness/*.sh
   mkdir -p "$HOME/.claude/self-harness"
   sqlite3 "$HOME/.claude/self-harness/harness.sqlite" < "$DOTFILES_DIR/claude/self-harness/schema.sql"

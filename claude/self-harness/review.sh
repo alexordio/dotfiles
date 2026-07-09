@@ -9,6 +9,15 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib.sh
 source "$DIR/lib.sh"
 
+# Renders through delta (syntax-highlighted diffs) if installed, plain otherwise.
+show_diff() {
+  if command -v delta >/dev/null 2>&1; then
+    delta --paging=never
+  else
+    cat
+  fi
+}
+
 ids="$(db "SELECT id FROM proposals WHERE status = 'pending' ORDER BY created_at;")"
 
 if [ -z "$ids" ]; then
@@ -34,13 +43,13 @@ while IFS= read -r id <&3; do
   if [ "$target_surface" = "repo_local" ]; then
     old_file="$target_repo/$target_path"
     [ -f "$old_file" ] || old_file=/dev/null
-    diff -u "$old_file" - <<< "$content" || true
+    diff -u "$old_file" - <<< "$content" | show_diff || true
     echo ""
     read -r -p "[a]ccept / [r]eject / [s]kip > " choice
   elif [ -n "$branch" ] && [ -n "$target_repo" ]; then
     base="$(git -C "$target_repo" merge-base HEAD "$branch" 2>/dev/null || echo "")"
     if [ -n "$base" ]; then
-      git -C "$target_repo" --no-pager diff "$base..$branch"
+      git -C "$target_repo" --no-pager diff "$base..$branch" | show_diff
     else
       echo "  ! could not diff branch '$branch' in $target_repo — was it already merged/deleted?"
     fi
