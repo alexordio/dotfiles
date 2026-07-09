@@ -16,7 +16,7 @@ if [ -z "$ids" ]; then
   exit 0
 fi
 
-while IFS= read -r id; do
+while IFS= read -r id <&3; do
   row_json="$(db -json "SELECT * FROM proposals WHERE id = $id;" | jq -c '.[0]')"
   target_surface="$(echo "$row_json" | jq -r '.target_surface')"
   target_repo="$(echo "$row_json" | jq -r '.target_repo // empty')"
@@ -88,4 +88,4 @@ while IFS= read -r id; do
       echo "  (left pending)"
       ;;
   esac
-done <<< "$ids"
+done 3<<< "$ids"
