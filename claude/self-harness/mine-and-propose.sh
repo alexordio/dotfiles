@@ -42,8 +42,13 @@ run_pass() {
     return
   fi
 
-  local base_branch
+  local base_branch default_br
   base_branch="$(git -C "$repo_dir" branch --show-current)"
+  default_br="$(default_branch "$repo_dir")"
+  if [ -n "$default_br" ] && [ "$base_branch" != "$default_br" ]; then
+    echo "  ! $repo_dir is on '$base_branch', not its default branch '$default_br' — skipping so a proposal doesn't branch off unrelated work-in-progress"
+    return
+  fi
 
   local prompt
   prompt="You are the proposal stage of a self-improvement loop over Claude Code's own harness (skills, subagents, CLAUDE.md). Read $TMP_DIR/incidents.json (accumulated friction signals from real sessions) and $TMP_DIR/proposal_history.json (past proposals and their verdicts — an accepted or rejected entry is a strong prior; a rejection's feedback field tells you what was wrong about that angle, do not repeat it).
@@ -64,15 +69,25 @@ When done, respond with ONLY this JSON (no prose, no markdown fences):
 {\"proposals\": [{\"target_surface\": \"skill|subagent|claude_md|ordio_standards|out_of_scope\", \"target_path\": \"<repo-relative path, or null for out_of_scope>\", \"branch\": \"<branch name, or null for out_of_scope>\", \"summary\": \"<what changed and why, one paragraph>\", \"incident_ids\": [<the incident ids this is built on>]}]}"
 
   set +e
-  result_json=$(cd "$repo_dir" && gtimeout 600 claude -p "$prompt" --output-format json --permission-mode acceptEdits 2>/dev/null)
+  result_json=$(cd "$repo_dir" && gtimeout 1500 claude -p "$prompt" --output-format json --permission-mode acceptEdits 2>/dev/null)
   exit_code=$?
   set -e
   if [ $exit_code -ne 0 ] || [ -z "$result_json" ]; then
     echo "  ! mining pass failed for $repo_dir (exit $exit_code) — will retry next run"
+    # A kill mid-edit (e.g. gtimeout firing) can leave an uncommitted change
+    # sitting in a repo you actively work in — that's a live, unreviewed
+    # mutation, exactly what this whole system exists to prevent. Never leave
+    # it behind.
+    if [ -n "$(git -C "$repo_dir" status --porcelain)" ]; then
+      echo "  ! killed mid-edit left uncommitted changes in $repo_dir — reverting"
+      git -C "$repo_dir" checkout -- . 2>/dev/null || true
+      git -C "$repo_dir" clean -fd 2>/dev/null || true
+    fi
+    git -C "$repo_dir" checkout "$base_branch" 2>/dev/null || true
     return
   fi
 
-  proposals_json=$(echo "$result_json" | jq -r '.result // empty' | jq -c '.proposals // []' 2>/dev/null || echo '[]')
+  proposals_json="$(parse_proposals "$result_json" "$(basename "$repo_dir")")"
 
   echo "$proposals_json" | jq -c '.[]?' | while read -r p; do
     target_surface=$(echo "$p" | jq -r '.target_surface')
@@ -91,6 +106,10 @@ When done, respond with ONLY this JSON (no prose, no markdown fences):
     );"
     echo "  → proposal: $target_surface ${target_path:-(out of scope)}"
   done
+
+  # Leave the repo back on its base branch — a proposal branch left checked
+  # out would fail the default-branch guard on every future run.
+  git -C "$repo_dir" checkout "$base_branch" 2>/dev/null || true
 }
 
 run_pass "claude/agents/*.md, claude/personal-plugin/skills/*/SKILL.md, CLAUDE.md" \
@@ -133,7 +152,7 @@ Respond with ONLY this JSON (no prose, no markdown fences):
 {\"proposals\": [{\"target_path\": \"CLAUDE.local.md|.claude/skills/<name>/SKILL.md|.claude/agents/<name>.md\", \"content\": \"<full file body>\", \"summary\": \"<what and why, one paragraph>\", \"incident_ids\": [<the incident ids this is built on>]}]}"
 
   set +e
-  result_json=$(cd "$repo_dir" && gtimeout 300 claude -p "$prompt" --output-format json --permission-mode plan 2>/dev/null)
+  result_json=$(cd "$repo_dir" && gtimeout 600 claude -p "$prompt" --output-format json --permission-mode plan 2>/dev/null)
   exit_code=$?
   set -e
   if [ $exit_code -ne 0 ] || [ -z "$result_json" ]; then
@@ -141,7 +160,7 @@ Respond with ONLY this JSON (no prose, no markdown fences):
     return
   fi
 
-  proposals_json=$(echo "$result_json" | jq -r '.result // empty' | jq -c '.proposals // []' 2>/dev/null || echo '[]')
+  proposals_json="$(parse_proposals "$result_json" "repo_local-$repo")"
 
   echo "$proposals_json" | jq -c '.[]?' | while read -r p; do
     target_path=$(echo "$p" | jq -r '.target_path')
