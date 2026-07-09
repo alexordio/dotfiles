@@ -2,11 +2,16 @@
 -- Dedicated DB, separate from claude-broker's data/broker.sqlite.
 -- Applied idempotently (CREATE TABLE/INDEX IF NOT EXISTS) by run.sh on every invocation.
 
+-- last_line: how many lines of the transcript have been mined so far. Sessions
+-- aren't "seen once and done" — you rarely close a session (just /clear), so a
+-- single file keeps growing for days. Each run mines only the delta since
+-- last_line, so a long-lived session gets revisited daily instead of going
+-- dark after its first digest.
 CREATE TABLE IF NOT EXISTS sessions (
   id           TEXT PRIMARY KEY,           -- Claude Code sessionId
   repo         TEXT NOT NULL,              -- e.g. "payroll-api", "ordio-standards"
   project_path TEXT NOT NULL,              -- cwd recorded in the transcript
-  started_at   TEXT,                       -- timestamp of the first line, if known
+  last_line    INTEGER NOT NULL DEFAULT 0, -- transcript lines mined so far
   digested_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
