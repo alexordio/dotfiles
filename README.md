@@ -5,7 +5,6 @@ My personal Claude Code setup, shell functions, and assorted dev environment con
 ## What's here
 
 claude/ Claude Code config: CLAUDE.md, settings, agents, hooks, statusline
-claude/self-harness/ Daily self-improvement loop (see below)
 shell/ Shell functions sourced from .zshrc
 install.sh Idempotent bootstrap script
 
@@ -21,7 +20,11 @@ install.sh Idempotent bootstrap script
   - `ordio-pr-reviewer` (Sonnet) — reviews diffs against `REVIEW.md` + `CLAUDE.md` + standards repo
   - `symfony-debugger` (Sonnet) — root-cause investigation, evidence-first
 - **`shell/functions.sh`** — `commit()` generates commit messages from staged diffs using `claude -p`.
-- **`self-harness/`** — daily loop (LaunchAgent, 09:00) that mines new Claude Code sessions in Ordio repos for recurring friction and drafts narrow proposals — edits to my skills/subagents/CLAUDE.md, to the shared `ordio-standards` constitution, or personal gitignored per-repo notes (`CLAUDE.local.md`, `.claude/skills|agents`). Never auto-applies anything: proposals land as local branches (or plain files for the personal case) and I review/accept/reject with `self-harness/review.sh`. Notifies via Slack webhook when there's something to look at.
+
+**self-harness** (the daily loop that mines my own Claude Code sessions for recurring friction and
+turns real patterns into rules) now lives in its own repo, `~/Desktop/my-projects/self-harness` —
+it grew past "a folder in dotfiles" once it needed its own schema, tests, and a skill of its own.
+Not published anywhere yet.
 
 ## Install
 
