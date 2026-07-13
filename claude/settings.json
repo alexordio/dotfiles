@@ -291,7 +291,8 @@
     "ordio-SDD@ordio-tools": true,
     "ponytail@ponytail": true,
     "sincrai@sincrai": true,
-    "warp@claude-code-warp": true
+    "warp@claude-code-warp": true,
+    "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "personal": {
