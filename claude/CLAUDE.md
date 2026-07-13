@@ -32,10 +32,10 @@
 - Verify before declaring done. Don't say "fixed" or "this is the root cause" without checking it against real evidence — reproduce the bug, look at real data/output, don't reason from the code alone. If you haven't verified it, say so ("I think..." not "this is..."). Before considering something closed, check whether the same pattern exists elsewhere (another validator, another endpoint) — a fix for one instance isn't a fix for the pattern. This extends to cross-repo contracts too: don't assert or build against another repo's field/contract without verifying it against the real implementation on the other side or a local integration test.
 - Before trusting (or debugging around) a `docker exec` test/lint run that fails or returns suspiciously fast/empty, check Docker itself is healthy first (`docker ps`, `docker info`) — a down or wedged daemon can fail silently or hang, and that's easy to misread as "passed" or as a code bug. If Docker is actually broken, say so explicitly and treat local verification as unavailable rather than guessing.
 
-## Ordio workflow (repos using GitFlow: development → feature branch → main)
+## Ordio workflow
 
-- Before starting a new ticket/feature: ask first, or start directly from `development`. Only exception: if the work depends on another ticket, branch from that ticket's branch instead.
-- Always `git pull` on `development` before opening the new branch — never branch from a stale state.
+- In repos using GitFlow (development → feature branch → main): before starting a new ticket/feature, ask first, or start directly from `development`. Only exception: if the work depends on another ticket, branch from that ticket's branch instead. Always `git pull` on `development` before opening the new branch — never branch from a stale state.
+- Before opening a PR, run the `ordio-pr-reviewer` subagent against your own changes rather than trusting your own read of the diff as sufficient — 3 real incidents where an automated review bot (Copilot/claude[bot]) caught a real bug that self-review had missed or incorrectly justified as correct.
 
 ## Claude plugins (ordio)
 
