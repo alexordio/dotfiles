@@ -29,6 +29,11 @@
 - Fail fast. Prefer explicit errors over silent fallbacks.
 - Match the existing style of the file you are editing, even if it disagrees with general best practices.
 
+## Ordio workflow (repos using GitFlow: development → feature branch → main)
+
+- Before starting a new ticket/feature: ask first, or start directly from `development`. Only exception: if the work depends on another ticket, branch from that ticket's branch instead.
+- Always `git pull` on `development` before opening the new branch — never branch from a stale state.
+
 ## Claude plugins (ordio)
 
 - To sync ordio plugins: `sync-ordio-plugins` (alias in `~/.zshrc`). Updates existing + installs new ones from https://github.com/ordio/claude-plugins.
