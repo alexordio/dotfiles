@@ -24,6 +24,7 @@
 - Use `rg` (ripgrep) instead of `grep` or `find` for searching.
 - Use `fd` instead of `find` for file discovery.
 - When running tests or commands, prefer the project's conventions (check the project CLAUDE.md or package.json/composer.json scripts) over invoking binaries directly.
+- Before doing something manually that's repetitive or well-defined (reviewing a PR, addressing PR comments, etc.), check whether an existing skill or subagent already covers it — use that instead of reimplementing the workflow by hand.
 
 ## Code quality
 
@@ -31,6 +32,7 @@
 - Don't add comments explaining why a fix was made or referencing a ticket — that belongs in the PR/commit description. Comment only for non-obvious invariants or constraints.
 - Fail fast. Prefer explicit errors over silent fallbacks.
 - Match the existing style of the file you are editing, even if it disagrees with general best practices.
+- Before writing new code, check whether an existing pattern/helper in the codebase already solves it (or something close) — reuse or extend it instead of writing a parallel implementation.
 - After a merge/rebase or dependency change, proactively clear stale test/DI-container caches (e.g. `bin/console cache:clear --env=test`) and confirm the test DB has new migrations applied, before trusting a local test failure or trying to diagnose the code — several "real" failures turn out to just be stale cache.
 - Verify before declaring done. Don't say "fixed" or "this is the root cause" without checking it against real evidence — reproduce the bug, look at real data/output, don't reason from the code alone. If you haven't verified it, say so ("I think..." not "this is..."). Before considering something closed, check whether the same pattern exists elsewhere (another validator, another endpoint) — a fix for one instance isn't a fix for the pattern. This extends to cross-repo contracts too: don't assert or build against another repo's field/contract without verifying it against the real implementation on the other side or a local integration test.
 - Before trusting (or debugging around) a `docker exec` test/lint run that fails or returns suspiciously fast/empty, check Docker itself is healthy first (`docker ps`, `docker info`) — a down or wedged daemon can fail silently or hang, and that's easy to misread as "passed" or as a code bug. If Docker is actually broken, say so explicitly and treat local verification as unavailable rather than guessing.
