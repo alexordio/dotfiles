@@ -28,6 +28,7 @@
 ## Code quality
 
 - Types over comments. If a type signature makes a comment redundant, remove the comment.
+- Don't add comments explaining why a fix was made or referencing a ticket — that belongs in the PR/commit description. Comment only for non-obvious invariants or constraints.
 - Fail fast. Prefer explicit errors over silent fallbacks.
 - Match the existing style of the file you are editing, even if it disagrees with general best practices.
 - After a merge/rebase or dependency change, proactively clear stale test/DI-container caches (e.g. `bin/console cache:clear --env=test`) and confirm the test DB has new migrations applied, before trusting a local test failure or trying to diagnose the code — several "real" failures turn out to just be stale cache.
