@@ -9,8 +9,18 @@
 # natively. Use this for real work (edit + git + build + PR) in another repo,
 # and for cross-repo fan-out (one rooted agent per repo, in parallel).
 #
+# By default the agent works in an isolated git worktree, not your actual
+# checkout — two things editing the same checkout can silently destroy each
+# other's uncommitted work (e.g. a branch switch wiping the agent's edits, or
+# vice versa). When the agent finishes:
+#   - no changes made          -> worktree + branch are deleted, nothing to do
+#   - changes made, checkout clean -> worktree is folded into your checkout:
+#     removed, then `git checkout <branch>` there so it shows up in your IDE
+#   - changes made, checkout dirty -> nothing is touched; the worktree path
+#     and branch are printed so you can decide what to do
+#
 # Usage:
-#   repo-agent.sh <repo> [--yolo] [--model <m>] [--json] [--add-dir <p>]... <task...>
+#   repo-agent.sh <repo> [--yolo] [--no-worktree] [--model <m>] [--json] [--add-dir <p>]... <task...>
 #
 #   <repo>  Absolute path, OR a bare name resolved under $ORDIO_REPOS_ROOT
 #           (default: "$HOME/Desktop/Repos Ordio"). e.g. `ordio`, `sdk.js`.
@@ -22,6 +32,8 @@
 #                     Without it, runs in acceptEdits: file edits flow, but
 #                     commands that would prompt (git push, pnpm, gh pr create)
 #                     are denied in headless mode — i.e. investigate+edit only.
+#   --no-worktree     Work directly in the shared checkout instead (old
+#                     behavior) — only when you deliberately want that.
 #   --model <m>       Model alias/id passed to --model.
 #   --json            Machine output (--output-format json) for orchestration.
 #   --add-dir <p>     Extra directory the rooted agent may also touch (repeatable).
@@ -48,10 +60,12 @@ perm=(--permission-mode acceptEdits)
 out=()
 extra=()
 model=()
+use_worktree=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --yolo) perm=(--dangerously-skip-permissions); shift ;;
+    --no-worktree) use_worktree=0; shift ;;
     --json) out=(--output-format json); shift ;;
     --model) model=(--model "$2"); shift 2 ;;
     --add-dir) extra+=(--add-dir "$2"); shift 2 ;;
@@ -74,8 +88,44 @@ else
 fi
 
 repo_dir="$(cd "$repo_dir" && pwd)"
-echo ">> repo-agent rooted in: $repo_dir" >&2
+work_dir="$repo_dir"
+wt_dir=""
+wt_branch=""
+base_branch=""
+
+if [[ "$use_worktree" -eq 1 ]] && git -C "$repo_dir" rev-parse --git-dir >/dev/null 2>&1; then
+  base_branch="$(git -C "$repo_dir" rev-parse --abbrev-ref HEAD)"
+  wt_branch="repo-agent/$(basename "$repo_dir")-$$"
+  wt_dir="$(mktemp -d "${TMPDIR:-/tmp}/repo-agent-XXXXXX")"
+  rmdir "$wt_dir"
+  git -C "$repo_dir" worktree add -q -b "$wt_branch" "$wt_dir" "$base_branch"
+  work_dir="$wt_dir"
+  echo ">> isolated worktree: $wt_dir (branch: $wt_branch, off: $base_branch)" >&2
+fi
+
+echo ">> repo-agent rooted in: $work_dir" >&2
 echo ">> mode: ${perm[*]}" >&2
 
-cd "$repo_dir"
-exec claude -p "$task" "${perm[@]}" "${model[@]}" "${out[@]}" "${extra[@]}"
+cd "$work_dir"
+set +e
+claude -p "$task" "${perm[@]}" "${model[@]}" "${out[@]}" "${extra[@]}"
+code=$?
+set -e
+
+if [[ -n "$wt_dir" ]]; then
+  dirty="$(git -C "$wt_dir" status --porcelain)"
+  ahead="$(git -C "$wt_dir" rev-list --count "$base_branch..HEAD")"
+  if [[ -z "$dirty" && "$ahead" -eq 0 ]]; then
+    git -C "$repo_dir" worktree remove "$wt_dir"
+    git -C "$repo_dir" branch -D "$wt_branch" >/dev/null
+    echo ">> no changes, worktree removed" >&2
+  elif [[ -z "$(git -C "$repo_dir" status --porcelain)" ]]; then
+    git -C "$repo_dir" worktree remove "$wt_dir" --force
+    git -C "$repo_dir" checkout -q "$wt_branch"
+    echo ">> checkout is clean, switched $repo_dir to branch $wt_branch" >&2
+  else
+    echo ">> your checkout at $repo_dir has uncommitted changes — leaving the agent's work on branch $wt_branch at $wt_dir for you to review" >&2
+  fi
+fi
+
+exit $code

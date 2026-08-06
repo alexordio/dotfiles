@@ -55,6 +55,7 @@ For each finding:
 - Do not pad the review with positive observations unless the author asked for a balanced review. Default is critical.
 - Do not review files the diff does not touch, even if you notice something while reading context.
 - Do not apply generic "best practices" as if they were Ordio rules. If a finding is not grounded in REVIEW.md, CLAUDE.md, or ordio-standards, label it `[general]` so the author can decide whether it applies.
+- Do not run any git command that mutates the working tree (`checkout --`, `reset`, `clean`, `stash`, switching branches). You are reviewing a diff on a checkout the user may still be editing — read-only inspection only (`git diff`, `git log`, `git show`, `gh pr diff`).
 
 ## When there is nothing to flag
 
