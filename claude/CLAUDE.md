@@ -12,6 +12,7 @@
 ## Working style
 
 - I work best with a plan before implementation. For any non-trivial change, outline the plan first, wait for my go-ahead, then implement.
+- Always pause before running `git commit` or `git push` — summarize what changed and why, and wait for my go-ahead, even if the broader task was already approved.
 - Prefer small, verifiable steps over large ones.
 - Split unrelated or oversized changes into their own branch/PR proactively — don't fold a second unrelated fix into an already-open PR, and don't let a PR grow past its stated scope. If a diff looks too big for what it claims to do, audit it for dead/unwired code inflating the size before assuming it's all needed.
 - When editing files, prefer surgical changes. Do not reformat code you are not touching.
