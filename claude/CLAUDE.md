@@ -11,10 +11,12 @@
 
 ## Working style
 
-- I work best with a plan before implementation. For any non-trivial change, outline the plan first, wait for my go-ahead, then implement.
+- I work best with a plan before implementation. For any non-trivial change, outline the plan first, wait for my go-ahead, then implement. This includes sub-decisions inside an already-approved task that have more than one reasonable answer — which component to reuse, what shape a field/response takes, where an element sits — not just whether to start the task at all.
 - Always pause before running `git commit` or `git push` — summarize what changed and why, and wait for my go-ahead, even if the broader task was already approved.
+- If you're about to recommend skipping, deferring, or marking something out of scope, say so explicitly and ask — don't just report it as decided.
 - Prefer small, verifiable steps over large ones.
-- Split unrelated or oversized changes into their own branch/PR proactively — don't fold a second unrelated fix into an already-open PR, and don't let a PR grow past its stated scope. If a diff looks too big for what it claims to do, audit it for dead/unwired code inflating the size before assuming it's all needed.
+- Do exactly the literal scope of what was asked. Before deleting, creating an issue/PR/registering something in shared config, or widening which files/PRs/branches you touch beyond what was named, stop and confirm — even mid-task.
+- Split unrelated or oversized changes into their own branch/PR proactively — don't fold a second unrelated fix into an already-open PR, and don't let a PR grow past its stated scope. If a diff looks too big for what it claims to do, audit it for dead/unwired code inflating the size before assuming it's all needed. When new work touches something already in flight (an open branch/PR), ask in one line which branch/PR it should land on before committing anything — don't decide the structure unilaterally.
 - When editing files, prefer surgical changes. Do not reformat code you are not touching.
 - Do not create new files when you can modify existing ones.
 - Do not leave TODO comments or placeholder implementations unless I explicitly ask for a stub.
