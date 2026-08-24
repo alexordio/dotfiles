@@ -17,15 +17,17 @@ Every PR from the terminal starts in draft. CI is watched in the background; the
    ```
    Write the description the same way you normally would (reuse `gh-pr-description` skill if available).
 
-3. **Watch CI in the background** — do not block the conversation on this:
+3. **Watch CI in the background** — do not block the conversation on this. `gh pr checks --watch` can exit clean before GitHub has even registered the checks for this push, or before a late-arriving status check (e.g. codecov/patch) lands — its exit code alone is not proof CI is done:
    ```bash
-   gh pr checks <number> --watch --interval 30 && echo CI_PASSED || echo CI_FAILED
+   gh pr checks <number> --watch --interval 30; echo WATCH_EXITED
    ```
-   Run this via a backgrounded Bash call (`run_in_background: true`) right after opening the PR, then continue with whatever else the user is doing. `gh pr checks --watch` already polls natively — no custom loop needed.
+   Run this via a backgrounded Bash call (`run_in_background: true`) right after opening the PR, then continue with whatever else the user is doing.
 
-4. **On completion (you'll get notified):** CI can take 10+ minutes, so the user is likely not watching the terminal — FIRST send a system push notification with the PushNotification tool so the result actually reaches them (e.g. "CI green on PR #123 — ready for review?" / "CI failed on PR #123: PHPUnit"), THEN post the details in the conversation:
-   - **CI_PASSED** → tell the user CI is green and ask if they want it marked ready for review now. Only run `gh pr ready <number>` after they say yes. Never mark ready automatically.
-   - **CI_FAILED** → report which checks failed (`gh pr checks <number>`) and offer to fix them (the `address-pr-checks` skill if available), or leave it in draft for the user to handle.
+4. **On completion (you'll get notified):** the watch returning is a cue to re-check, not the answer itself. Always re-run `gh pr checks <number>` fresh (no `--watch`) once it returns, and read the actual per-check states — don't trust the watch's own success/failure. If anything is still pending, treat the watch's exit as inconclusive and re-watch rather than reporting a result.
+
+   CI can take 10+ minutes, so the user is likely not watching the terminal — FIRST send a system push notification with the PushNotification tool so the result actually reaches them (e.g. "CI green on PR #123 — ready for review?" / "CI failed on PR #123: PHPUnit"), THEN post the details in the conversation:
+   - **All checks pass (confirmed by the fresh re-query)** → tell the user CI is green and ask if they want it marked ready for review now. Only run `gh pr ready <number>` after they say yes. Never mark ready automatically.
+   - **Any check failed** → report which ones (from the fresh re-query) and offer to fix them (the `address-pr-checks` skill if available), or leave it in draft for the user to handle.
 
 ## Notes
 
