@@ -13,6 +13,7 @@
 
 - I work best with a plan before implementation. For any non-trivial change, outline the plan first, wait for my go-ahead, then implement. This includes sub-decisions inside an already-approved task that have more than one reasonable answer — which component to reuse, what shape a field/response takes, where an element sits — not just whether to start the task at all.
 - Always pause before running `git commit` or `git push` — summarize what changed and why, and wait for my go-ahead, even if the broader task was already approved.
+- Always pause before posting a reply/comment to Slack, a GitHub PR thread, or a GitHub issue — draft it and show me first, wait for my go-ahead, even if the underlying investigation or fix was already approved. Approval covers one message, not the thread — don't treat "yes, reply to that" as blanket permission for follow-ups in the same thread.
 - If you're about to recommend skipping, deferring, or marking something out of scope, say so explicitly and ask — don't just report it as decided.
 - Prefer small, verifiable steps over large ones.
 - Do exactly the literal scope of what was asked. Before deleting, creating an issue/PR/registering something in shared config, or widening which files/PRs/branches you touch beyond what was named, stop and confirm — even mid-task.
