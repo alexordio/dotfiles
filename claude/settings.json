@@ -234,6 +234,7 @@
     "defaultMode": "auto"
   },
   "model": "sonnet",
+  "outputStyle": "plain-language",
   "hooks": {
     "SessionStart": [
       {
