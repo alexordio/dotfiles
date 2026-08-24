@@ -274,6 +274,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '(.tool_response.stdout // \"\") + \"\\n\" + (.tool_response.stderr // \"\")' | grep -qEi 'entity listener .* not found|cannot autowire|too few arguments to function|unknown column|no route found for|has no autowiring definition' && jq -n '{hookSpecificOutput:{hookEventName:\"PostToolUse\",additionalContext:\"This looks like a stale Symfony/Doctrine cache signature (unknown column, missing entity listener, autowiring mismatch, or a 404 on a route that should exist) rather than a real code bug \u2014 clear the cache (bin/console cache:clear --env=test, or the repo make target) before diagnosing further.\"}}' || true",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
