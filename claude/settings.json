@@ -100,6 +100,11 @@
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(gh api -X GET:*)",
+      "Bash(gh api graphql:*)",
+      "Bash(gh api repos/ordio/:*)",
+      "Bash(gh api --method GET repos/ordio/:*)",
+      "Bash(gh api --method POST repos/ordio/:*)",
+      "Bash(gh api --method PATCH repos/ordio/:*)",
       "Bash(gh auth status)",
       "Bash(gh release list:*)",
       "Bash(gh release view:*)",
@@ -214,7 +219,6 @@
       "Bash(npx:*)",
       "Bash(curl:*)",
       "Bash(wget:*)",
-      "Bash(gh api:*)",
       "Bash(docker compose exec php bin/console doctrine:migrations:*)",
       "Bash(docker compose exec php bin/console doctrine:schema:*)",
       "Bash(docker compose exec php bin/console doctrine:fixtures:*)",
@@ -227,21 +231,10 @@
       "Bash(gh issue create:*)",
       "Bash(gh issue close:*)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
   "model": "sonnet",
   "hooks": {
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "afplay /System/Library/Sounds/Glass.aiff 2>/dev/null || true",
-            "async": true
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "hooks": [
@@ -253,6 +246,14 @@
             "type": "command",
             "command": "echo \"$PWD\" > ~/.claude/current_project",
             "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/alexander/Desktop/claude-broker/dist/hook.js"
           }
         ]
       }
@@ -300,7 +301,13 @@
     "ponytail@ponytail": true,
     "sincrai@sincrai": true,
     "warp@claude-code-warp": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "automatic-code-review@ordio-tools": true,
+    "mcp-issues-dashboard@ordio-tools": true,
+    "sdk-release-candidate@ordio-tools": true,
+    "ux-evaluation@ordio-tools": true,
+    "pr-loop-dashboard@ordio-tools": true,
+    "scheduled-review@ordio-tools": true
   },
   "extraKnownMarketplaces": {
     "personal": {
@@ -325,16 +332,6 @@
   "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true,
-  "mcpServers": {
-    "broker": {
-      "command": "node",
-      "args": [
-        "/Users/alexander/Desktop/claude-broker/dist/index.js"
-      ],
-      "env": {
-        "BROKER_DB_PATH": "/Users/alexander/Desktop/claude-broker/data/broker.sqlite"
-      }
-    }
-  }
+  "verbose": true,
+  "agentPushNotifEnabled": true
 }
