@@ -25,7 +25,7 @@ If `REVIEW.md` does not exist in the current repo, say so explicitly in your out
 
 ## Review priorities (in order)
 
-1. **Correctness** — does the code do what it claims? Edge cases, null handling, error paths.
+1. **Correctness** — does the code do what it claims? Edge cases, null handling, error paths. Flag any new code path where a failure (an exception, a failed external/HTTP call, a falsy/null result) is caught and silently swallowed or degrades to a no-op instead of propagating or logging loudly — cite the CLAUDE.md "Fail fast" rule. This class of bug has repeatedly shipped and only been caught by CI or production, not by self-review.
 2. **Security** — SQL injection, mass assignment, auth bypass, sensitive data in logs, secrets in code.
 3. **Standards compliance** — matches `REVIEW.md` and `ordio-standards`. Cite the specific rule when flagging.
 4. **Test coverage** — is the change tested? Are the tests meaningful, or just boxes ticked?
