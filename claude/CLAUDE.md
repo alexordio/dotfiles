@@ -66,6 +66,15 @@ Applies in **every** ordio repo (payroll-api, ordio, web, payroll-frontend, x, s
 - It only accepts self-contained `.html` files — no `.xlsx`, no external assets. A spreadsheet deliverable has to be rendered as an HTML table to live there.
 - Setup, if missing on a machine: `npm config set @ordio:registry=https://npm.pkg.github.com`, then `npm config set //npm.pkg.github.com/:_authToken="$(gh auth token)"` (the `gh` token needs the `read:packages` scope — `gh auth refresh --hostname github.com -s read:packages`), then `claude mcp add ordio-artifacts --scope user -e ARTIFACTS_API_KEY=oart_… -e ARTIFACTS_BASE_URL=https://ordio-artifacts.fly.dev -- npx -y @ordio/artifacts-mcp`. Key from the API-keys page at https://ordio-artifacts.fly.dev; I run the `add` myself so the key stays out of the transcript. Requires a Claude Code restart.
 
+## Personal permission workarounds
+
+- When running the `automatic-code-review` skill's scratch-cleanup step, use
+  `bash ~/dotfiles/claude/bin/cleanup-automatic-code-review-scratch.sh <path>` instead of the
+  skill's documented raw `rm -rf <path>` — my `rm -rf` deny rules match by prefix and can't safely
+  carve out an exception for this one scratch path, so the wrapper script (which validates the
+  target itself) is what's actually allow-listed. `git worktree add/remove/prune` are separately
+  allow-listed and need no substitution.
+
 ## Claude plugins (ordio)
 
 - To sync ordio plugins: `sync-ordio-plugins` (alias in `~/.zshrc`). Updates existing + installs new ones from https://github.com/ordio/claude-plugins.
