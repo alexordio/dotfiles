@@ -34,6 +34,13 @@
 #                     are denied in headless mode — i.e. investigate+edit only.
 #   --no-worktree     Work directly in the shared checkout instead (old
 #                     behavior) — only when you deliberately want that.
+#   --timeout <min>   Kill the run if it's still going after <min> minutes
+#                     (default 20). A headless run can hang forever on a
+#                     permission prompt nobody can answer (e.g. a pnpm
+#                     install confirmation) — without this it blocks
+#                     indefinitely with zero feedback. Requires GNU `timeout`
+#                     (or `gtimeout` from coreutils); if neither is on PATH,
+#                     runs without a timeout and prints a warning.
 #   --model <m>       Model alias/id passed to --model.
 #   --json            Machine output (--output-format json) for orchestration.
 #   --add-dir <p>     Extra directory the rooted agent may also touch (repeatable).
@@ -61,11 +68,13 @@ out=()
 extra=()
 model=()
 use_worktree=1
+timeout_min=20
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --yolo) perm=(--dangerously-skip-permissions); shift ;;
     --no-worktree) use_worktree=0; shift ;;
+    --timeout) timeout_min="$2"; shift 2 ;;
     --json) out=(--output-format json); shift ;;
     --model) model=(--model "$2"); shift 2 ;;
     --add-dir) extra+=(--add-dir "$2"); shift 2 ;;
@@ -73,6 +82,15 @@ while [[ $# -gt 0 ]]; do
     *) break ;;
   esac
 done
+
+timeout_cmd=()
+if command -v timeout >/dev/null 2>&1; then
+  timeout_cmd=(timeout "${timeout_min}m")
+elif command -v gtimeout >/dev/null 2>&1; then
+  timeout_cmd=(gtimeout "${timeout_min}m")
+else
+  echo ">> warning: no 'timeout'/'gtimeout' on PATH — running with no time limit (brew install coreutils to enable)" >&2
+fi
 
 task="$*"
 [[ -n "$task" ]] || { echo "error: no task given" >&2; exit 2; }
@@ -108,9 +126,17 @@ echo ">> mode: ${perm[*]}" >&2
 
 cd "$work_dir"
 set +e
-claude -p "$task" "${perm[@]}" "${model[@]}" "${out[@]}" "${extra[@]}"
+"${timeout_cmd[@]}" claude -p "$task" "${perm[@]}" "${model[@]}" "${out[@]}" "${extra[@]}"
 code=$?
 set -e
+
+if [[ $code -eq 124 ]]; then
+  echo ">> TIMED OUT after ${timeout_min}m — likely stuck on an unanswerable permission prompt (e.g. pnpm install)." >&2
+  if [[ -n "$wt_dir" ]]; then
+    echo ">> the checkout at $repo_dir was never touched; the agent's partial work (if any) is on branch $wt_branch at $wt_dir for you to inspect or discard." >&2
+  fi
+  exit $code
+fi
 
 if [[ -n "$wt_dir" ]]; then
   dirty="$(git -C "$wt_dir" status --porcelain)"

@@ -31,7 +31,12 @@ bash "/Users/alexander/dotfiles/claude/personal-plugin/skills/repo-agent/repo-ag
 - `<repo>`: absolute path, or a bare name resolved under `$ORDIO_REPOS_ROOT` (default `~/Desktop/Repos Ordio`) — e.g. `ordio`, `sdk.js`, `web`, `accounts`, `payroll-api`.
 - Default mode = `acceptEdits`: edits flow, but commands that would prompt (git push, pnpm, gh pr create) are **denied** in headless mode → use for **investigate + edit, then hand back** (the main session commits/pushes).
 - `--yolo` = `--dangerously-skip-permissions`: full autonomy incl. git/pnpm/gh. Only for trusted tasks.
+- `--timeout <min>` (default 20): kills the run if it's still going after that long. A headless run can hang forever on a prompt nobody can answer (e.g. a pnpm install confirmation) — this is what turns that into a clear failure instead of an indefinite silent hang. Runs in the isolated worktree, so a timeout never leaves the main checkout in a bad state.
 - `--json`: machine output for parsing when orchestrating.
+
+## Before trusting the result
+
+Always look at the diff before folding it into your checkout or treating it as done — `git -C <worktree-dir> diff <base-branch>`. A rooted agent has silently changed already-agreed behavior before (e.g. swapping an agreed exception-throw for a quiet empty-list return) without flagging the deviation. This matters even more with `--yolo`, since it can commit/push/open the PR itself before you've seen anything.
 
 ## Patterns
 
