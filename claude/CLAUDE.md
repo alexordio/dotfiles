@@ -30,7 +30,7 @@
 - Use `rg` (ripgrep) instead of `grep` or `find` for searching.
 - Use `fd` instead of `find` for file discovery.
 - When running tests or commands, prefer the project's conventions (check the project CLAUDE.md or package.json/composer.json scripts) over invoking binaries directly.
-- When I say "mira/mura los comentarios de la pr" (or similar), that means invoke the `pr-workflow-tools:address-pr-comments` skill — don't read/reply to comments by hand.
+- When I say "mira los comentarios de la pr" (or similar), that means invoke the `pr-workflow-tools:address-pr-comments` skill — don't read/reply to comments by hand.
 - Before doing something manually that's repetitive or well-defined (reviewing a PR, addressing PR comments, etc.), check whether an existing skill or subagent already covers it — use that instead of reimplementing the workflow by hand.
 
 ## Code quality
