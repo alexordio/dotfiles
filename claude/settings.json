@@ -276,6 +276,11 @@
             "type": "command",
             "command": "~/.claude/auto-approve/approve-compound-bash.sh",
             "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-prettier-before-push.sh",
+            "timeout": 30
           }
         ]
       }
