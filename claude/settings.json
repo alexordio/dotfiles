@@ -281,6 +281,11 @@
             "type": "command",
             "command": "~/.claude/hooks/check-prettier-before-push.sh",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-truncated-verification.sh",
+            "timeout": 3
           }
         ]
       }
