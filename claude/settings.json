@@ -233,7 +233,8 @@
       "Bash(gh pr merge:*)",
       "Bash(gh pr close:*)",
       "Bash(gh issue create:*)",
-      "Bash(gh issue close:*)"
+      "Bash(gh issue close:*)",
+      "Bash(*generate-jwt-keys.sh*)"
     ],
     "defaultMode": "auto"
   },
@@ -251,6 +252,10 @@
             "type": "command",
             "command": "echo \"$PWD\" > ~/.claude/current_project",
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/warn-concurrent-session.sh"
           }
         ]
       },
