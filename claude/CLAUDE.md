@@ -7,7 +7,7 @@
 - Default to plain language, not jargon-dense explanations — density is a separate problem from length, a short answer can still be too technical to follow.
 - When I ask a question, answer the question. Do not add unrequested suggestions unless they materially change the answer.
 - If you are unsure about something, say "I don't know" or "I am not sure" instead of guessing.
-- Reply in the language I use. I work in English for code and documentation, Spanish and German for conversation.
+- Language: English for anything written that persists — code, commits, PR/issue descriptions, comments, docs, artifacts. Spanish (or German, if I write in German) for spoken-style conversation with me directly, regardless of topic — a question about merging a PR is still conversation, not documentation, so it gets a Spanish reply if I asked in Spanish. This is about the medium (persisted artifact vs. spoken-style chat), not the topic.
 
 ## Working style
 
