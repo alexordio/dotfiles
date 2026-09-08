@@ -9,6 +9,7 @@ cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // ""')
 model=$(echo "$input" | jq -r '.model.display_name // "claude"')
 ctx_pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
 five_hour=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // 0')
+five_hour_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // ""')
 
 if [ -n "$cwd" ]; then
   repo=$(basename "$cwd")
@@ -39,5 +40,10 @@ else
   rl_color="$red"
 fi
 
-printf "${bold}%s${reset} ${dim}|${reset} ${dim}%s${reset} ${dim}|${reset} ${ctx_color}ctx: %d%%${reset} ${dim}|${reset} ${rl_color}5h: %d%%${reset}" \
-  "$repo" "$model" "$ctx_pct" "$five_hour"
+if [ -n "$five_hour_reset" ] && [ "$five_hour_reset" != "0" ]; then
+  reset_local=$(TZ=Europe/Berlin date -r "$five_hour_reset" +%H:%M 2>/dev/null || TZ=Europe/Berlin date -d "@$five_hour_reset" +%H:%M 2>/dev/null)
+fi
+[ -n "$reset_local" ] && five_hour_label="5h: ${five_hour}% (resets ${reset_local})" || five_hour_label="5h: ${five_hour}%"
+
+printf "${bold}%s${reset} ${dim}|${reset} ${dim}%s${reset} ${dim}|${reset} ${ctx_color}ctx: %d%%${reset} ${dim}|${reset} ${rl_color}%s${reset}" \
+  "$repo" "$model" "$ctx_pct" "$five_hour_label"
