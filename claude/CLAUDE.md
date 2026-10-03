@@ -1,5 +1,24 @@
 # Global Claude preferences
 
+## Code navigation
+
+Prefer Serena for codebase exploration and semantic navigation.
+
+Use Serena tools such as:
+- find_symbol
+- find_referencing_symbols
+- get_symbols_overview
+- search_for_pattern
+
+Prefer symbol-level retrieval over reading entire files.
+
+Only use Read/Grep directly when:
+- Serena cannot answer the query,
+- exact raw file contents are required,
+- or the target location is already known and only a small section is needed.
+
+Avoid broad repository exploration with repeated Grep/Read calls when Serena can retrieve the relevant symbols.
+
 ## Communication
 
 - Be direct and critical. Do not be sycophantic. If my approach is wrong, say so and explain why.
@@ -32,6 +51,7 @@
 - When running tests or commands, prefer the project's conventions (check the project CLAUDE.md or package.json/composer.json scripts) over invoking binaries directly.
 - When I say "mira los comentarios de la pr" (or similar), that means invoke the `pr-workflow-tools:address-pr-comments` skill — don't read/reply to comments by hand.
 - Before doing something manually that's repetitive or well-defined (reviewing a PR, addressing PR comments, etc.), check whether an existing skill or subagent already covers it — use that instead of reimplementing the workflow by hand.
+- Claude Code token/cost usage (all sessions on this Mac, including headless `claude -p` runs like scheduled-review/self-harness) is tracked daily into `~/.claude-usage/usage.sqlite`, keyed by session and resolved to a project — raw transcripts under `~/.claude/projects/` get pruned after ~30 days, this survives that. Query it directly with sqlite3 (or the `usage-top [days]` shell function) instead of guessing at what's consuming tokens: `sqlite3 -header -column ~/.claude-usage/usage.sqlite "SELECT project, ROUND(SUM(cost),2) cost_usd, SUM(tokens) tokens, COUNT(*) sessions FROM sessions WHERE date >= date('now','-7 days') GROUP BY project ORDER BY cost_usd DESC"`.
 
 ## Code quality
 
@@ -49,14 +69,15 @@
 ## Ordio workflow
 
 - In repos using GitFlow (development → feature branch → main): before starting a new ticket/feature, ask first, or start directly from `development`. Only exception: if the work depends on another ticket, branch from that ticket's branch instead. Always `git pull` on `development` before opening the new branch — never branch from a stale state.
-- Before opening a PR, run the `ordio-pr-reviewer` subagent against your own changes rather than trusting your own read of the diff as sufficient — 3 real incidents where an automated review bot (Copilot/claude[bot]) caught a real bug that self-review had missed or incorrectly justified as correct. This is a standing request: it counts as explicitly requested by me, so any session-level "don't call subagents unless asked" rule does not apply to it — run it without asking. Run it once, at the end, against the complete diff and the ticket's acceptance criteria — not piecemeal on pieces as they're written. A partial review has already let real bugs through to bot review that a full pass would have caught.
-- Reviewer findings (ordio-pr-reviewer, Copilot, claude[bot]) are claims, not instructions: before applying or forwarding one that hinges on product intent or an existing convention (access-control scope, severity, "use shared component X"), verify it against the surrounding code's actual pattern or ask me.
+- Before opening a PR, run central-reviewer's self review (`~/Desktop/Repos Ordio/payroll-cockpit/engine/bin/review-local [base]`, from inside the repo, after committing — it refuses uncommitted changes) against your own changes rather than trusting your own read of the diff as sufficient — 3 real incidents where an automated review bot (Copilot/claude[bot]) caught a real bug that self-review had missed or incorrectly justified as correct. This is a standing request: it counts as explicitly requested by me, so run it without asking. Run it once, at the end, against the complete diff and the ticket's acceptance criteria — not piecemeal on pieces as they're written. A partial review has already let real bugs through to bot review that a full pass would have caught.
+- Reviewer findings (central-reviewer, Copilot, claude[bot]) are claims, not instructions: before applying or forwarding one that hinges on product intent or an existing convention (access-control scope, severity, "use shared component X"), verify it against the surrounding code's actual pattern or ask me.
 - **Post-mortems live in `ordio/postmortems`** (private repo; one file per incident, `YYYY-MM-DD-short-description.md`, from its `TEMPLATE.md`, opened as a PR). Applies in **every** ordio repo. When a session turns out to involve a production incident, data loss, a security issue, a customer-visible failure, or anything that blocked work for a meaningful stretch — including near-misses caught before user impact, and any failure class that has now happened twice — **recommend a post-mortem before closing the topic**, and say concretely what it would cover: timeline, root cause (the deepest why, not the surface config), why the safeguards were blind, action items. Write it only if I say yes; the recommendation is the part you must not skip. Don't propose one for ordinary bugs found and fixed in-flight.
 
 ## ordio-artifacts (internal MCP)
 
 Applies in **every** ordio repo (payroll-api, ordio, web, payroll-frontend, x, sdk, mcp, accounts, …), not just the one you happen to be in.
 
+- **Search it before investigating.** At the start of any non-trivial investigation (a bug, a data question, "how does X work", a cross-repo mechanism), call `list_artifacts` and `read_artifact` on anything whose title matches the topic — earlier analyses (mechanism maps, affected-customer lists, measured counts) live there, not in the repo. Say what you found and how old it is; treat its numbers as a dated snapshot to re-check, not as current truth. If nothing matches, say so in one line and continue.
 - When an HTML report/dashboard is meant to be shared with someone at @ordio.com (not just for me), use the `ordio-artifacts` MCP instead of the built-in Artifact tool. Personal/one-off artifacts still go to the built-in Artifact tool.
 - **Recommend publishing proactively — I should not have to think of it.** After any non-trivial piece of work that produces durable, reusable knowledge (incident investigation, root-cause analysis, affected-customer list, mechanism explanation, dashboard, architecture map), close by actively proposing an upload: what to publish, why it's worth keeping, and who it's useful to. The analysis is the expensive part and it otherwise dies in terminal scrollback — the next person re-derives it from scratch. Goal: make ordio-artifacts a real internal knowledge base.
 - **Two artefacts, not one.** When both exist, propose both and say which comes first: the **incident artefact** (dated, this month's affected cases) and the **mechanism artefact** (how the system actually works, which control layer is blind where). The mechanism one outlives the incident and is usually the more valuable — recommend it first.
@@ -65,7 +86,7 @@ Applies in **every** ordio repo (payroll-api, ordio, web, payroll-frontend, x, s
 - Pseudonymize production personal data before publishing, and keep the real-identity key in a local file that is never uploaded. Customer company names usually have to stay readable for the report to be useful — flag that explicitly and let me decide.
 - Reports for the German-speaking team go in German. GitHub content stays English.
 - It only accepts self-contained `.html` files — no `.xlsx`, no external assets. A spreadsheet deliverable has to be rendered as an HTML table to live there.
-- Setup, if missing on a machine: `npm config set @ordio:registry=https://npm.pkg.github.com`, then `npm config set //npm.pkg.github.com/:_authToken="$(gh auth token)"` (the `gh` token needs the `read:packages` scope — `gh auth refresh --hostname github.com -s read:packages`), then `claude mcp add ordio-artifacts --scope user -e ARTIFACTS_API_KEY=oart_… -e ARTIFACTS_BASE_URL=https://ordio-artifacts.fly.dev -- npx -y @ordio/artifacts-mcp`. Key from the API-keys page at https://ordio-artifacts.fly.dev; I run the `add` myself so the key stays out of the transcript. Requires a Claude Code restart.
+- Setup, if missing on a machine: `npm config set @ordio:registry=https://npm.pkg.github.com`, then `npm config set //npm.pkg.github.com/:_authToken="$(gh auth token)"` (the `gh` token needs the `read:packages` scope — `gh auth refresh --hostname github.com -s read:packages`), then `npm i -g @ordio/artifacts-mcp`, then `claude mcp add ordio-artifacts --scope user -e ARTIFACTS_API_KEY=oart_… -e ARTIFACTS_BASE_URL=https://artifacts.ordio.rocks -- artifacts-mcp` (the global binary, not `npx -y`: with npx it failed with `CONNECTION_CLOSED` inside sessions while the same config worked from a shell; cause not found). Key from the API-keys page at https://artifacts.ordio.rocks; I run the `add` myself so the key stays out of the transcript. Requires a Claude Code restart.
 
 ## Personal permission workarounds
 
