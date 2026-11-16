@@ -43,6 +43,7 @@ with its reason. Then wait. One question at a time if there are several.
 | `failed` | The round failed (an engine or agent error) | `rounds` with a comment to build it again from the approved spec |
 | `ready`, no `prs` | The result passed: review it and publish | `post …/publish` `{"draft": false, "link": "closes", "viewed": [<every "repo:path" in risk.must_view>]}` |
 | `ready`, with `prs` | The answers to the PR's review are ready: pushing them answers each thread | the same `publish` call |
+| `review-asks` | A reviewer raised a point only he can decide (`feedback` entries whose `verdict.action` is `ask` and `status` is not `posted`): show the reviewer's words, where, and the factory's `verdict.question` with its recommendation | per point, `post …/feedback-decide` `{"point": <id>, "action": "fix", "text": "<his instruction for the builder>"}`, or `"action": "answer"` / `"decline"` with his reply to the reviewer, in English. The reply goes out with the others on the next `publish`, never before |
 
 Before publishing, show him: `what_it_does`, each criterion and whether it is met, the `open` points, and the diff of
 every file in `risk.must_view` (he must have seen it: only then list it in `viewed`). For review answers, show each
