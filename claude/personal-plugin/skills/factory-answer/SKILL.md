@@ -53,6 +53,15 @@ feedback point with the factory's verdict (fix, decline, ask) and its reply.
 Only after his explicit yes in this session, the one call from the table. Show the answer of the call in one line
 (the PR link on publish). A refusal (400/409) says why: explain it and ask how to go on.
 
+## Stay on this change
+
+This session answers one change through the hub, and nothing else. It cannot reach the Mac mini, the engine or its
+logs: never try SSH, docker or the engine's API, and never guess a host or a user name. When he asks about the engine
+itself (a deploy, a version, a tool like `read-ci`, a bug like "the approver could not judge"), say in one line that
+this session cannot check it, show what the change's own data says (`approver.reasons`, a round's `error`), and
+suggest he asks it in an agent-hub session. A round that failed or stopped on an engine error is answered by asking
+for the round again (`rounds`), once the engine is fixed.
+
 ## Never
 
 - send anything he did not say yes to, or answer a question for him;
