@@ -36,7 +36,8 @@ say so and stop.
 
 It does **not** when any of these holds; say which, and suggest a normal session instead:
 
-1. it changes or cleans up existing production data (data migration, recalculation, backfill);
+1. it changes the data model (a migration, a new or changed column or table) or changes or cleans up existing
+   production data (data migration, recalculation, backfill);
 2. it must match a prototype or design;
 3. it does not fit one reviewable PR (~400 lines per repo) → split it into issues;
 4. the cause is still unknown → investigate first.
@@ -54,7 +55,9 @@ Do it, then tell him in three or four lines what you found:
 - pick a staging company or employee to verify it on (skill `ordio-staging-data`); for a bug, confirm it on real
   data (`ordio-staging-data` or `ordio-prod-data`, read only);
 - for a CI or flaky-test issue, read the failing runs (`gh run view <id> --log-failed`, artifacts): the factory
-  cannot.
+  cannot;
+- find the existing tests that pin the behaviour this change corrects: the builder may not edit an existing test
+  unless the spec names it, and stops on it otherwise (change 9, payroll-api#1754).
 
 ## 4. Ask, one at a time
 
@@ -87,6 +90,11 @@ The spec is `spec.SCHEMA` of the engine (`payroll-cockpit/engine/src/central_rev
   CI, a deploy or production can show: it can never pass in the factory (that stalled change 8).
 - Every question he answered here goes in `questions` with its answer in `answers` (`{"Q-1": "…"}`): the
   builder sees both.
+- Hand over what you found, as leads, never as steps: `likely_files` with the files to touch; in `assumptions`, the
+  pattern to reuse (`file:line` of the sibling that already does it), the existing tests to update and why, where
+  the data the change needs comes from, and the staging target. The builder decides the how with the code in front
+  of it; a fixed plan is followed even when it is wrong.
+- Docs to update go in `assumptions`, never in `criteria`: the approver needs a test for every criterion.
 - Read `api "$HUB/api/brain/index"` and list the Brain records the spec relies on.
 
 Show him the spec in Spanish (what it does, the criteria in one line each, what it does not do), then the issue as
