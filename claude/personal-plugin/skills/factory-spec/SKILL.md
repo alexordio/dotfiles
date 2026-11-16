@@ -91,7 +91,7 @@ The spec is `spec.SCHEMA` of the engine (`payroll-cockpit/engine/src/central_rev
 - Every question he answered here goes in `questions` with its answer in `answers` (`{"Q-1": "…"}`): the
   builder sees both.
 - Hand over what you found, as leads, never as steps: `likely_files` with the files to touch; in `assumptions`, the
-  pattern to reuse (`file:line` of the sibling that already does it), the existing tests to update and why, where
+  pattern to reuse (`file:line` of the sibling that already does it), the existing tests to update, each by its full path in the repo (only a test named so may be edited), and why, where
   the data the change needs comes from, and the staging target. The builder decides the how with the code in front
   of it; a fixed plan is followed even when it is wrong.
 - Docs to update go in `assumptions`, never in `criteria`: the approver needs a test for every criterion.

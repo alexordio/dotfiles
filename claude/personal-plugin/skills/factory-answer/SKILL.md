@@ -68,7 +68,10 @@ for the round again (`rounds`), once the engine is fixed.
 - send anything he did not say yes to, or answer a question for him;
 - edit the spec or a comment's text beyond what he said;
 - publish without showing the must-view diffs;
-- discard a change (`post …/discard`) unless he asks for exactly that.
+- discard a change (`post …/discard`) unless he asks for exactly that. Discarding is not a pause: the branch and the
+  rounds' work are dropped, no PR is opened, and the ticket stays undone. Before it, say so in those words, with what
+  the ticket still asks for, and send it only when he answers with the word "descartar" (a "go with your
+  recommendation" is not enough when the recommendation is to discard).
 
 When done, say in one line that the change goes on in the factory: the herdr tab follows it, and this pane closes by
 itself once you are idle.
